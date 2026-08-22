@@ -1,17 +1,8 @@
 {
   "buildCommand": "pip install -r requirements.txt",
-  "env": {
-    "PYTHONUNBUFFERED": "1"
-  },
   "functions": {
-    "api/app.py": {
+    "api/*.py": {
       "runtime": "python3.9"
     }
-  },
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/app.py"
-    }
-  ]
+  }
 }
