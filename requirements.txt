@@ -1,0 +1,3 @@
+Flask==2.3.7
+Werkzeug==2.3.7
+pypdf==3.16.4
