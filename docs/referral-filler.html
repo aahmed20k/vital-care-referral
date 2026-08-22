@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vital Care Referral Form Filler</title>
+    <style>
+        * { box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            margin: 0;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #087eae 0%, #066f9b 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 32px;
+            font-weight: 700;
+        }
+        
+        .header p {
+            margin: 10px 0 0;
+            font-size: 15px;
+            opacity: 0.95;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .form-section {
+            margin-bottom: 40px;
+        }
+        
+        .form-section h2 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #102b3f;
+            margin: 0 0 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #dff5fc;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            font-weight: 600;
+            color: #173042;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 10px 12px;
+            border: 1px solid #d8e7ee;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 14px;
+            color: #173042;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #087eae;
+            box-shadow: 0 0 0 3px rgba(8, 126, 174, 0.1);
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .required::after {
+            content: " *";
+            color: #f5222d;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 40px;
+        }
+        
+        button {
+            padding: 12px 32px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-primary {
+            background: #087eae;
+            color: white;
+            box-shadow: 0 4px 12px rgba(8,126,174,0.3);
+        }
+        
+        .btn-primary:hover:not(:disabled) {
+            background: #066f9b;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(8,126,174,0.4);
+        }
+        
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .btn-secondary {
+            background: #f3fbfe;
+            color: #102b3f;
+            border: 2px solid #102b3f;
+        }
+        
+        .btn-secondary:hover {
+            background: #dff5fc;
+        }
+        
+        .alert {
+            padding: 16px 20px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            border-left: 4px solid;
+        }
+        
+        .alert-info {
+            background: #e7f5fc;
+            color: #087eae;
+            border-left-color: #087eae;
+        }
+        
+        .alert-success {
+            background: #e6f7ed;
+            color: #155724;
+            border-left-color: #28a745;
+        }
+        
+        .alert-error {
+            background: #fdeaea;
+            color: #721c24;
+            border-left-color: #f5222d;
+        }
+        
+        .referral-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+            margin-top: 12px;
+        }
+        
+        .referral-btn {
+            padding: 12px 16px;
+            border: 2px solid #d8e7ee;
+            border-radius: 6px;
+            background: white;
+            color: #173042;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 13px;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+        
+        .referral-btn:hover {
+            border-color: #087eae;
+            color: #087eae;
+        }
+        
+        .referral-btn.active {
+            background: #087eae;
+            color: white;
+            border-color: #087eae;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Vital Care Referral Form Filler</h1>
+            <p>Generate and download patient referral forms quickly and easily</p>
+        </div>
+        
+        <div class="content">
+            <div id="messages"></div>
+            
+            <form id="referralForm">
+                <!-- Referral Type -->
+                <div class="form-section">
+                    <label style="font-weight: 700; font-size: 14px; display: block; margin-bottom: 12px;">
+                        Select Referral Type <span style="color: #f5222d;">*</span>
+                    </label>
+                    <div class="referral-types" id="referralTypes"></div>
+                    <input type="hidden" id="referralType" name="referralType" required>
+                </div>
+
+                <!-- Patient Information -->
+                <div class="form-section">
+                    <h2>Patient Information</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="required">First Name</label>
+                            <input type="text" name="firstName" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="required">Last Name</label>
+                            <input type="text" name="lastName" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="required">Date of Birth (MM/DD/YYYY)</label>
+                            <input type="text" name="dob" placeholder="01/15/1990" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Phone</label>
+                            <input type="tel" name="phone" placeholder="(513) 123-4567">
+                        </div>
+                        <div class="form-group">
+                            <label>SSN (last 4)</label>
+                            <input type="text" name="ssn" maxlength="4">
+                        </div>
+                        <div class="form-group">
+                            <label>Gender</label>
+                            <select name="gender">
+                                <option value="">Select...</option>
+                                <option value="M">Male</option>
+                                <option value="F">Female</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Weight (kg)</label>
+                            <input type="number" name="weight" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label>Height</label>
+                            <input type="text" name="height" placeholder="5'10\"">
+                        </div>
+                        <div class="form-group">
+                            <label>Address</label>
+                            <input type="text" name="address">
+                        </div>
+                        <div class="form-group">
+                            <label>City</label>
+                            <input type="text" name="city">
+                        </div>
+                        <div class="form-group">
+                            <label>State</label>
+                            <input type="text" name="state" maxlength="2">
+                        </div>
+                        <div class="form-group">
+                            <label>Zip</label>
+                            <input type="text" name="zip" maxlength="5">
+                        </div>
+                        <div class="form-group">
+                            <label>Allergies</label>
+                            <input type="text" name="allergies">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Insurance -->
+                <div class="form-section">
+                    <h2>Insurance Information</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Insurance Plan</label>
+                            <input type="text" name="insurancePlan">
+                        </div>
+                        <div class="form-group">
+                            <label>Policy Number</label>
+                            <input type="text" name="policyNumber">
+                        </div>
+                        <div class="form-group">
+                            <label>Plan ID</label>
+                            <input type="text" name="planId">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Prescriber -->
+                <div class="form-section">
+                    <h2>Prescriber Information</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="required">Prescriber Name</label>
+                            <input type="text" name="prescriberName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>NPI</label>
+                            <input type="text" name="npi">
+                        </div>
+                        <div class="form-group">
+                            <label>Practice/Facility</label>
+                            <input type="text" name="practice">
+                        </div>
+                        <div class="form-group">
+                            <label>Phone</label>
+                            <input type="tel" name="prescriberPhone">
+                        </div>
+                        <div class="form-group">
+                            <label>Fax</label>
+                            <input type="tel" name="prescriberFax">
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" name="prescriberEmail">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Clinical -->
+                <div class="form-section">
+                    <h2>Clinical Information</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Diagnosis (ICD-10)</label>
+                            <input type="text" name="diagnosis">
+                        </div>
+                        <div class="form-group">
+                            <label>Medication</label>
+                            <input type="text" name="medication">
+                        </div>
+                        <div class="form-group">
+                            <label>Dose & Frequency</label>
+                            <input type="text" name="dose">
+                        </div>
+                        <div class="form-group">
+                            <label>Vascular Access</label>
+                            <select name="vascularAccess">
+                                <option value="">Select...</option>
+                                <option value="Peripheral IV">Peripheral IV</option>
+                                <option value="PICC">PICC</option>
+                                <option value="Port">Port</option>
+                                <option value="Central">Central</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Clinical Notes</label>
+                            <textarea name="clinicalNotes"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pharmacy -->
+                <div class="form-section">
+                    <h2>Pharmacy Information (Optional)</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Pharmacy Name</label>
+                            <input type="text" name="pharmacyName">
+                        </div>
+                        <div class="form-group">
+                            <label>Phone</label>
+                            <input type="tel" name="pharmacyPhone">
+                        </div>
+                        <div class="form-group">
+                            <label>Fax</label>
+                            <input type="tel" name="pharmacyFax">
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" name="pharmacyEmail">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Buttons -->
+                <div class="button-group">
+                    <button type="reset" class="btn-secondary">Clear Form</button>
+                    <button type="submit" class="btn-primary">Generate Referral Summary</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const REFERRAL_TYPES = [
+            { id: 'IG', label: 'Immunoglobulin (IG)' },
+            { id: 'IVABx', label: 'IV Antibiotics' },
+            { id: 'TPN', label: 'TPN' },
+            { id: 'Alpha1', label: 'Alpha-1' },
+            { id: 'Dermatology', label: 'Dermatology' },
+            { id: 'Enteral', label: 'Enteral' },
+            { id: 'GI', label: 'Gastroenterology' },
+            { id: 'HomeInfusion', label: 'Home Infusion' },
+            { id: 'ImmuneDeficiency', label: 'Immune Deficiency' },
+            { id: 'Neurology', label: 'Neurology' },
+            { id: 'Rheumatology', label: 'Rheumatology' },
+        ];
+
+        function showMessage(msg, type = 'info') {
+            const container = document.getElementById('messages');
+            const div = document.createElement('div');
+            div.className = `alert alert-${type}`;
+            div.textContent = msg;
+            container.innerHTML = '';
+            container.appendChild(div);
+        }
+
+        function initReferralTypes() {
+            const container = document.getElementById('referralTypes');
+            REFERRAL_TYPES.forEach(type => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'referral-btn';
+                btn.textContent = type.label;
+                btn.onclick = (e) => {
+                    e.preventDefault();
+                    document.getElementById('referralType').value = type.id;
+                    document.querySelectorAll('.referral-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        document.getElementById('referralForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!document.getElementById('referralType').value) {
+                showMessage('Please select a referral type', 'error');
+                return;
+            }
+
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+            
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            
+            try {
+                // Try to use the API (if hosted on Vercel/Cloud)
+                const apiUrl = 'https://YOUR-PROJECT.vercel.app'; // Update this
+                const response = await fetch(`${apiUrl}/api/fill`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        formType: data.referralType,
+                        formData: data
+                    })
+                }).catch(() => null);
+                
+                if (response && response.ok) {
+                    // Download PDF
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `referral_${data.referralType}_${data.lastName}.pdf`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                    
+                    showMessage('✓ PDF downloaded successfully! Print and fax to (513) 780-5881', 'success');
+                    submitBtn.disabled = false;
+                    return;
+                }
+            } catch (err) {
+                console.log('API not available, showing summary instead');
+            }
+            
+            // Fallback: Show summary for manual filling
+            let summary = `
+📋 REFERRAL SUMMARY
+═══════════════════════════════════════════════════════
+
+REFERRAL TYPE: ${data.referralType}
+
+PATIENT INFORMATION:
+  Name: ${data.firstName} ${data.lastName}
+  DOB: ${data.dob}
+  Phone: ${data.phone || 'N/A'}
+  SSN (last 4): ${data.ssn || 'N/A'}
+  Gender: ${data.gender || 'N/A'}
+  Weight: ${data.weight || 'N/A'} kg
+  Height: ${data.height || 'N/A'}
+  Address: ${data.address || 'N/A'}, ${data.city || ''} ${data.state || ''} ${data.zip || ''}
+  Allergies: ${data.allergies || 'None'}
+
+INSURANCE:
+  Plan: ${data.insurancePlan || 'N/A'}
+  Policy #: ${data.policyNumber || 'N/A'}
+  Plan ID: ${data.planId || 'N/A'}
+
+PRESCRIBER:
+  Name: ${data.prescriberName}
+  NPI: ${data.npi || 'N/A'}
+  Practice: ${data.practice || 'N/A'}
+  Phone: ${data.prescriberPhone || 'N/A'}
+  Fax: ${data.prescriberFax || 'N/A'}
+  Email: ${data.prescriberEmail || 'N/A'}
+
+CLINICAL:
+  Diagnosis: ${data.diagnosis || 'N/A'}
+  Medication: ${data.medication || 'N/A'}
+  Dose: ${data.dose || 'N/A'}
+  Vascular Access: ${data.vascularAccess || 'N/A'}
+  Notes: ${data.clinicalNotes || 'None'}
+
+PHARMACY:
+  Name: ${data.pharmacyName || 'N/A'}
+  Phone: ${data.pharmacyPhone || 'N/A'}
+  Fax: ${data.pharmacyFax || 'N/A'}
+  Email: ${data.pharmacyEmail || 'N/A'}
+
+═══════════════════════════════════════════════════════
+NEXT STEPS:
+1. Download the blank PDF form for this referral type
+2. Open it in Adobe Reader
+3. Copy/paste the information above into the form fields
+4. Print the completed form
+5. Fax to: (513) 780-5881
+            `;
+            
+            showMessage('✓ Referral summary generated! (Using manual fill mode)', 'success');
+            alert(summary);
+            submitBtn.disabled = false;
+        });
+
+        // Initialize on page load
+        window.addEventListener('load', () => {
+            initReferralTypes();
+            showMessage('✓ Ready to create referral forms. Select a referral type and fill in patient information.', 'info');
+        });
+    </script>
+</body>
+</html>
